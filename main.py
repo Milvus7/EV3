@@ -172,7 +172,7 @@ class Bot():
             return Colors.WHITE
 
         if hls[2] < -0.8:
-            return Colors.RED if rgb[1] < 140 else Colors.ORANGE
+            return Colors.RED if rgb[0] < 140 else Colors.ORANGE
 
         if hls[0] < 0.2:
             return Colors.YELLOW
@@ -186,7 +186,8 @@ def main():
     bot = Bot()
     while True:
         try:
-            print(Colors.to_string[bot.get_color(bot.color_sensor.raw)])
+            print(bot.color_sensor.raw, Colors.to_string[bot.get_color(bot.color_sensor.raw)])
+            #print(Colors.to_string[bot.get_color(bot.color_sensor.raw)])
         except:
             print("err")
     
