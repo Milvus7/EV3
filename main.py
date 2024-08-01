@@ -23,6 +23,14 @@ class Colors:
     ORANGE = 4
     GREEN = 5
     
+    to_string = {
+        0: "white",
+        1: "red",
+        2: "blue",
+        3: "yellow",
+        4: "orange",
+        5: "green"
+    }
     
 class Bot():
     def __init__(self):
@@ -159,13 +167,12 @@ class Bot():
     #le stolen, but tuned myself
     def get_color(self, rgb):
         hls = rgb_to_hls(*rgb)
-        print(hls, " ", rgb)
         
         if hls[2] > -0.4:
             return Colors.WHITE
 
-        if hls[2] < -0.7:
-            return Colors.RED if rgb[1] < 100 else Colors.ORANGE
+        if hls[2] < -0.8:
+            return Colors.RED if rgb[1] < 140 else Colors.ORANGE
 
         if hls[0] < 0.2:
             return Colors.YELLOW
@@ -179,7 +186,7 @@ def main():
     bot = Bot()
     while True:
         try:
-            print(bot.color_sensor.raw)
+            print(Colors.to_string[bot.get_color(bot.color_sensor.raw)])
         except:
             print("err")
     
