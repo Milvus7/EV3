@@ -39,19 +39,27 @@ class Cube():
                 self.cube[i*9+j] = i
     
     def __str__(self):
-        return f"""      +-----+
-      |{self.cube[0]} {self.cube[1]} {self.cube[2]}|
-      |{self.cube[3]} {self.cube[4]} {self.cube[5]}|
-      |{self.cube[6]} {self.cube[7]} {self.cube[8]}|
-+-----+-----+-----+-----+
-|{self.cube[45]} {self.cube[46]} {self.cube[47]}|{self.cube[9]} {self.cube[10]} {self.cube[11]}|{self.cube[18]} {self.cube[19]} {self.cube[20]}|{self.cube[36]} {self.cube[37]} {self.cube[38]}|
-|{self.cube[48]} {self.cube[49]} {self.cube[50]}|{self.cube[12]} {self.cube[13]} {self.cube[14]}|{self.cube[21]} {self.cube[22]} {self.cube[23]}|{self.cube[39]} {self.cube[40]} {self.cube[41]}|
-|{self.cube[51]} {self.cube[52]} {self.cube[53]}|{self.cube[15]} {self.cube[16]} {self.cube[17]}|{self.cube[24]} {self.cube[25]} {self.cube[26]}|{self.cube[42]} {self.cube[43]} {self.cube[44]}|
-+-----+-----+-----+-----+
-      |{self.cube[27]} {self.cube[28]} {self.cube[29]}|
-      |{self.cube[30]} {self.cube[31]} {self.cube[32]}|
-      |{self.cube[33]} {self.cube[34]} {self.cube[35]}|
-      +-----+"""
+        out ="      +-----+\n"
+        out+="      |" + str(self.cube[0 ]) + " " + str(self.cube[1 ]) + " " + str(self.cube[2 ])+"|\n"
+        out+="      |" + str(self.cube[3 ]) + " " + str(self.cube[4 ]) + " " + str(self.cube[5 ])+"|\n"
+        out+="      |" + str(self.cube[6 ]) + " " + str(self.cube[7 ]) + " " + str(self.cube[8 ])+"|\n"
+        out+="+-----+-----+-----+-----+\n"
+        
+        out+="|" + str(self.cube[45]) + " " + str(self.cube[46]) + " " + str(self.cube[47])+"|" + str(self.cube[9 ]) + " " + str(self.cube[10]) + " " + str(self.cube[11])+"|"
+        out+=str(self.cube[18]) + " " + str(self.cube[19]) + " " + str(self.cube[20])+"|" + str(self.cube[36]) + " " + str(self.cube[37]) + " " + str(self.cube[38])+"|\n"
+
+        out+="|" + str(self.cube[48]) + " " + str(self.cube[49]) + " " + str(self.cube[50])+"|" + str(self.cube[12]) + " " + str(self.cube[13]) + " " + str(self.cube[14])+"|"
+        out+=str(self.cube[21]) + " " + str(self.cube[22]) + " " + str(self.cube[23])+"|" + str(self.cube[39]) + " " + str(self.cube[40]) + " " + str(self.cube[41])+"|\n"
+
+        out+="|" + str(self.cube[51]) + " " + str(self.cube[52]) + " " + str(self.cube[53])+"|" + str(self.cube[15]) + " " + str(self.cube[16]) + " " + str(self.cube[17])+"|"
+        out+=str(self.cube[24]) + " " + str(self.cube[25]) + " " + str(self.cube[26])+"|" + str(self.cube[42]) + " " + str(self.cube[43]) + " " + str(self.cube[44])+"|\n"
+
+        out+="+-----+-----+-----+-----+\n"
+        out+="      |" + str(self.cube[27]) + " " + str(self.cube[28]) + " " + str(self.cube[29])+"|\n"
+        out+="      |" + str(self.cube[30]) + " " + str(self.cube[31]) + " " + str(self.cube[32])+"|\n"
+        out+="      |" + str(self.cube[33]) + " " + str(self.cube[34]) + " " + str(self.cube[35])+"|\n"
+        out+="      +-----+"
+        return out
     
     #example: "l r2 f'"
     def do_sequence(self, sequence):
@@ -59,30 +67,32 @@ class Cube():
         for i in range(len(sequence)):
             face = -1
             dir = 1
-            match sequence[i][0].lower():
-                case "f":
-                    face = 1
-                case "r":
-                    face = 2
-                case "l":
-                    face = 5
-                case "u":
-                    face = 0
-                case "d":
-                    face = 3
-                case "b":
-                    face = 4
-                case _:
-                    raise "ERROR in sequence: " + sequence[i]
+            
+            #replacement match case
+            match_str = sequence[i][0].lower()
+            if match_str == "f":
+                face = 1
+            elif match_str == "r":
+                face = 2
+            elif match_str == "l":
+                face = 5
+            elif match_str == "u":
+                face = 0
+            elif match_str == "d":
+                face = 3
+            elif match_str == "b":
+                face = 4
+            else:
+                raise "ERROR in sequence: " + sequence[i]
             
             if (len(sequence[i]) == 2):
-                match sequence[i][1:]:
-                    case "'":
-                        dir = -1
-                    case "2":
-                        dir = 2
-                    case _:
-                        raise "ERROR in sequence: " + sequence[i]
+                #replacement match case
+                if sequence[i][1:] == "'":
+                    dir = -1
+                elif sequence[i][1:] == "2":
+                    dir = 2
+                else:
+                    raise "ERROR in sequence: " + sequence[i]
             
             self.rotate_face(face, dir)
 
@@ -92,27 +102,28 @@ class Cube():
     #2 is twice
         self.rotate_pieces(face*9, face*9+2, face*9+8, face*9+6, dir)
         self.rotate_pieces(face*9+1, face*9+5, face*9+7, face*9+3, dir)
-        match face:
-            case 0:
-                for i in range(3):
-                    self.rotate_pieces(9+i, 45+i, 36+i, 18+i, dir)
-            case 1:
-                for i in range(3):
-                    self.rotate_pieces(6+i, 18+3*i, 29-i, 53-3*i, dir)
-            case 2: 
-                for i in range(3):
-                    self.rotate_pieces(8-3*i, 36+3*i, 35-3*i, 17-3*i, dir)
-            case 3: 
-                for i in range(3):
-                    self.rotate_pieces(51+i, 15+i, 24+i, 42+i, dir)
-            case 4:
-                for i in range(3):
-                    self.rotate_pieces(2-i, 45+3*i, 33+i, 26-3*i, dir)
-            case 5:
-                for i in range(3):
-                    self.rotate_pieces(3*i, 9+3*i, 27+3*i, 44-3*i, dir)
-            case _:
-                raise f"Unknown face {face}"
+        
+        #replacement match case
+        if face == 0:
+            for i in range(3):
+                self.rotate_pieces(9+i, 45+i, 36+i, 18+i, dir)
+        elif face == 1:
+            for i in range(3):
+                self.rotate_pieces(6+i, 18+3*i, 29-i, 53-3*i, dir)
+        elif face == 2: 
+            for i in range(3):
+                self.rotate_pieces(8-3*i, 36+3*i, 35-3*i, 17-3*i, dir)
+        elif face == 3: 
+            for i in range(3):
+                self.rotate_pieces(51+i, 15+i, 24+i, 42+i, dir)
+        elif face == 4:
+            for i in range(3):
+                self.rotate_pieces(2-i, 45+3*i, 33+i, 26-3*i, dir)
+        elif face == 5:
+            for i in range(3):
+                self.rotate_pieces(3*i, 9+3*i, 27+3*i, 44-3*i, dir)
+        else:
+            raise "Unknown face "+face
             
     
     def is_valid(self): #checks if cube is a valid cube in a simple manner to see if scan was correct
@@ -150,8 +161,9 @@ class Cube():
             self.cube[b] = self.cube[d]
             self.cube[d] = temp
         else:
-            raise f"Unknown direction: {dir}"
-        
+            raise "Unknown direction: "+dir
+    
+    #TODO
     def simple_solve(self):
         temp_cube = Cube()
         temp_cube.cube = self.cube.copy()
@@ -169,25 +181,26 @@ class Cube():
             if (edge >= 9):
                 temp_cube.rotate_face(out_moves[-1], 2)
                 continue
-            match edge%9:
-                case 1:
-                    out_moves.append(1)
-                case 3:
-                    out_moves.append(5)
-                case 5:
-                    out_moves.append(2)
-                case 7:
-                    out_moves.append(4)
-                case _:
-                    raise "HELP SOMETHING WENT HORRIBLY WRONG"
+            
+            #replacement match case
+            if edge%9 == 1:
+                out_moves.append(1)
+            elif edge%9 == 3:
+                out_moves.append(5)
+            elif edge%9 == 5:
+                out_moves.append(2)
+            elif edge%9 == 7:
+                out_moves.append(4)
+            else:
+                raise "HELP SOMETHING WENT HORRIBLY WRONG"
                     
                 
             
-        print(temp_cube)
+        #print(temp_cube)
         return out_moves
 
-cube = Cube()
-cube.cube = [0, 2, 0, 0, 0, 4, 0, 5, 0, 2, 0, 5, 4, 1, 1, 5, 3, 2, 1, 3, 4, 3, 2, 1, 4, 0, 1, 3, 2, 3, 5, 3, 4, 3, 5, 3, 5, 0, 2, 2, 4, 5, 2, 3, 5, 4, 1, 1, 1, 5, 2, 1, 4, 4]
-print(cube)
-cube.simple_solve
-print(cube.simple_solve())
+#cube = Cube()
+#cube.cube = [0, 2, 0, 0, 0, 4, 0, 5, 0, 2, 0, 5, 4, 1, 1, 5, 3, 2, 1, 3, 4, 3, 2, 1, 4, 0, 1, 3, 2, 3, 5, 3, 4, 3, 5, 3, 5, 0, 2, 2, 4, 5, 2, 3, 5, 4, 1, 1, 1, 5, 2, 1, 4, 4]
+#print(cube)
+#cube.simple_solve
+#print(cube.simple_solve())

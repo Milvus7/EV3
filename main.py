@@ -3,7 +3,7 @@
 from time import sleep
 from colorsys import rgb_to_hls
 
-#import cube
+import cube
 
 from ev3dev2.motor import LargeMotor, OUTPUT_A, OUTPUT_B, OUTPUT_D, MediumMotor # type: ignore
 from ev3dev2.sensor import INPUT_1 # type: ignore
@@ -178,16 +178,28 @@ class Bot():
             return Colors.YELLOW
 
         return Colors.BLUE if hls[0] > 0.4 else Colors.GREEN
+    def move_sensor_to_angle(self, angle, speed=20):
+        self.sensor_motor.on_to_position(speed, angle)
+    
+    def get_sensor_rgb(self):
+        return self.color_sensor.raw
+    
+    def scan_centre(self):
+        self.move_sensor_to_angle(116)
+        return self.get_sensor_rgb()
     
     def scan_cube(self):
+        #self.scan_centre()
         pass
         
 def main():
     bot = Bot()
+    bot.scan_cube()
     while True:
         try:
-            print(bot.color_sensor.raw, Colors.to_string[bot.get_color(bot.color_sensor.raw)])
+            #print(bot.sensor_motor.position)
             #print(Colors.to_string[bot.get_color(bot.color_sensor.raw)])
+            pass
         except:
             print("err")
     
