@@ -159,9 +159,8 @@ class Bot():
     #le stolen, but tuned myself
     def get_color(self, rgb):
         hls = rgb_to_hls(*rgb)
-        print(hls)
-        print(rgb)
-
+        print(hls, " ", rgb)
+        
         if hls[2] > -0.4:
             return Colors.WHITE
 
