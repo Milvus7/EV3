@@ -1,6 +1,4 @@
 
-
-
 class Colors: 
     WHITE = 0
     RED = 1
@@ -30,6 +28,12 @@ class Colors:
 #          |33 34 35|
 #          +--------+
 
+#returns a list rotated by 90 deg clockwise n times 
+def rotate_list(inn_list, rotations):
+    out_list = inn_list
+    for _ in range(rotations):
+        out_list = [list(row) for row in zip(*reversed(out_list))]
+    return out_list
 
 class Cube():
     def __init__(self):
@@ -38,6 +42,77 @@ class Cube():
             for j in range(9):
                 self.cube[i*9+j] = i
     
+    #face = 3*3 matrix (assumed, pls be correct)
+    #face_above = int 0-5
+    #sets the corresponding face of the cube (looks at centre of face (1, 1) to see witch face to edit)
+    def insert_face(self, face, above_color: int):
+        my_color = face[1][1]
+        #rotate face to face correct direction
+        face = self.rotate_towards_face(face, above_color)
+        #un-nest it
+        face = sum(face, [])
+        
+        #insert it into the cube
+        self.cube[my_color*9:(my_color+1)*9]
+        
+       
+        
+    def rotate_towards_face(self, face, above_color: int):    
+        my_color = face[1][1]
+        #cant rotate towards itself
+        if above_color == my_color:
+            raise "Cant rotate face towards itself: " + above_color
+        #cant rotate to opposite face
+        if (my_color+3)%6 == my_color:
+            raise "Cant rotate to opposite face: " + my_color + " and opposite: " + (my_color+3)%6
+            
+        if my_color == Colors.YELLOW: 
+            #1=>0
+            #2=>1
+            #4=>2
+            #5=>3   
+            above_color -= 1
+            if above_color > 2:
+                above_color -= 1
+                
+            return rotate_list(face, above_color)
+        
+        if my_color == Colors.WHITE:
+            #1=>2
+            #2=>1
+            #4=>0
+            #5=>3   
+            if above_color > 3:
+                above_color -= 1
+            my_face = (4-my_face+3)%4
+            
+            return rotate_list(face, above_color)
+            
+        #0 needs no change
+        if my_color == Colors.WHITE:
+            return face
+        
+        #yellow always needs a 180 rotation
+        if above_color == Colors.YELLOW:
+            return rotate_list(face, 2)
+        
+        #you must at this point rotate at least once
+        rotate_list(face, 1)
+        
+        #blue and orange has a pattern that i exploit here
+        if (my_color == Colors.BLUE or my_color == Colors.ORANGE) and above_color < my_color:
+            return rotate_list(face, 2)
+        
+        if (my_color == Colors.RED and above_color == Colors.GREEN):
+            return rotate_list(face, 2)
+        
+        if (my_color == Colors.GREEN and above_color == Colors.ORANGE):
+            return rotate_list(face, 2)
+        
+        #needed only one rotation
+        return face
+        
+            
     def __str__(self):
         out ="      +-----+\n"
         out+="      |" + str(self.cube[0 ]) + " " + str(self.cube[1 ]) + " " + str(self.cube[2 ])+"|\n"

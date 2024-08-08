@@ -31,15 +31,21 @@ class Colors:
         4: "orange",
         5: "green"
     }
-    
+
+CORNER_ROTATOR_SCAN_ANGLE = 24.66
+EDGE_ROTATOR_SCAN_ANGLE = 75.66
+
 class Bot():
     def __init__(self):
         self.on_cube = False
         
         self.color_sensor = ColorSensor(INPUT_1)
         self.flipper_motor = LargeMotor(OUTPUT_A)
-        self.sensor_motor = MediumMotor(OUTPUT_B)
+        self.color_sensor_motor = MediumMotor(OUTPUT_B)
         self.rotator_motor = LargeMotor(OUTPUT_D)
+        
+        #if the ev3 is not rebooted between each program run, this is needed for some reason
+        self.color_sensor_motor.position = 0
         
     #flipper functions
     def flip_cube(self):
@@ -174,30 +180,83 @@ class Bot():
         if hls[2] < -0.8:
             return Colors.RED if rgb[0] < 140 else Colors.ORANGE
 
-        if hls[0] < 0.2:
+        if hls[0] < 0.25:
             return Colors.YELLOW
 
         return Colors.BLUE if hls[0] > 0.4 else Colors.GREEN
+    
     def move_sensor_to_angle(self, angle, speed=20):
-        self.sensor_motor.on_to_position(speed, angle)
+        self.color_sensor_motor.on_for_degrees(speed, angle-self.color_sensor_motor.position)
     
     def get_sensor_rgb(self):
         return self.color_sensor.raw
     
     def scan_centre(self):
-        self.move_sensor_to_angle(116)
-        return self.get_sensor_rgb()
+        self.move_sensor_to_angle(123)
+        return self.get_color(self.get_sensor_rgb())
+    
+    #assumes the cube is rotated 44 clockwise from each 90 deg rotation
+    def scan_edge(self):
+        self.move_sensor_to_angle(113)
+        return self.get_color(self.get_sensor_rgb())
+    
+    #assumes the cube is rotated 24.66 deg clockwise from each 90 deg rotation
+    def scan_corner(self):
+        self.move_sensor_to_angle(101)
+        return self.get_color(self.get_sensor_rgb())
+    
+    def move_sensor_out_of_the_way(self):
+        self.move_sensor_to_angle(10)
+    
+    #scans face and returns it as a 3*3 matrix
+    #up on the matrix is right of (extended) color sensor 
+    def scan_face(self):
+        out = [
+            [-1, -1, -1],
+            [-1, -1, -1],
+            [-1, -1, -1]
+        ]
+        
+        loop_dictionary = {
+        0: [[2, 2], [1, 2]],
+        1: [[0, 2], [0, 1]],
+        2: [[0, 0], [1, 0]],
+        3: [[2, 0], [2, 1]]
+    }
+        
+        out[1][1] = self.scan_centre()
+        self.rotate_cube(CORNER_ROTATOR_SCAN_ANGLE)
+        for i in range(4):
+            current_out_index = loop_dictionary[i]
+            sleep(0.2)
+            out[current_out_index[0][0]][current_out_index[0][1]] = self.scan_corner()
+            self.rotate_cube(EDGE_ROTATOR_SCAN_ANGLE-CORNER_ROTATOR_SCAN_ANGLE)
+            sleep(0.2)
+            out[current_out_index[1][0]][current_out_index[1][1]] = self.scan_edge()
+            self.rotate_cube(90-EDGE_ROTATOR_SCAN_ANGLE+CORNER_ROTATOR_SCAN_ANGLE)
+        
+        self.rotate_cube(-CORNER_ROTATOR_SCAN_ANGLE)
+        self.move_sensor_out_of_the_way()
+        return out
     
     def scan_cube(self):
-        #self.scan_centre()
+        self.scan_centre()
+        print(self.color_sensor_motor.position)
+        self.move_sensor_to_scan_edge()
         pass
         
 def main():
     bot = Bot()
-    bot.scan_cube()
+    bot.rotator_motor.position = 0
+    print(bot.scan_face())
+    #bot.rotate_cube(EDGE_ROTATOR_SCAN_ANGLE)
+    #print(bot.scan_edge())
+    #sleep(1)
+    #bot.rotate_cube(-EDGE_ROTATOR_SCAN_ANGLE)
     while True:
         try:
-            #print(bot.sensor_motor.position)
+            #print(rgb_to_hls(*bot.color_sensor.raw)[2])
+            #print(bot.rotator_motor.position/3, bot.color_sensor_motor.position)
             #print(Colors.to_string[bot.get_color(bot.color_sensor.raw)])
             pass
         except:
